@@ -82,6 +82,7 @@ class PreprocessPlugin : Plugin<Project> {
                     vars.convention(ext.vars)
                     keywords.convention(ext.keywords)
                     patternAnnotation.convention(ext.patternAnnotation)
+                    tabIndentation.convention(ext.tabIndentation)
                 }
                 val sourceJavaTask = project.tasks.findByName("source${name.capitalize()}Java")
                 (sourceJavaTask ?: project.tasks["compile${cName}Java"]).dependsOn(preprocessJava)
@@ -104,6 +105,7 @@ class PreprocessPlugin : Plugin<Project> {
                         vars.convention(ext.vars)
                         keywords.convention(ext.keywords)
                         patternAnnotation.convention(ext.patternAnnotation)
+                        tabIndentation.convention(ext.tabIndentation)
                     }
                     val kotlinConsumerTask = project.tasks.findByName("source${name.capitalize()}Kotlin")
                             ?: project.tasks["compile${cName}Kotlin"]

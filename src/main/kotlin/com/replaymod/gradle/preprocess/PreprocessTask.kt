@@ -110,6 +110,10 @@ open class PreprocessTask : DefaultTask() {
     @Optional
     val patternAnnotation = project.objects.property<String>()
 
+    @Input
+    @Optional
+    val tabIndentation = project.objects.property<Boolean>();
+
     fun source(file: Any) {
         source = project.files(file)
     }
@@ -185,7 +189,8 @@ open class PreprocessTask : DefaultTask() {
                     val lines = text.lines()
                     val kws = keywords.get().entries.find { (ext, _) -> file.name.endsWith(ext) }
                     if (kws != null) {
-                        processedSources[relPath.toString()] = CommentPreprocessor(vars.get()).convertSource(
+                        val indentationChar = if (tabIndentation.orElse(false).get()) '\t' else ' '
+                        processedSources[relPath.toString()] = CommentPreprocessor(indentationChar, vars.get()).convertSource(
                                 kws.value,
                                 lines,
                                 lines.map { Pair(it, emptyList()) },
@@ -205,7 +210,8 @@ open class PreprocessTask : DefaultTask() {
 
         project.delete(outPath)
 
-        val commentPreprocessor = CommentPreprocessor(vars.get())
+        val indentationChar = if (tabIndentation.orElse(false).get()) '\t' else ' '
+        val commentPreprocessor = CommentPreprocessor(indentationChar, vars.get())
         source.flatMap { base -> project.fileTree(base).map { Pair(base, it) } }.forEach { (base, file) ->
             val relPath = base.toPath().relativize(file.toPath())
             val outFile = outPath.resolve(relPath).toFile()
@@ -238,7 +244,7 @@ open class PreprocessTask : DefaultTask() {
     }
 }
 
-class CommentPreprocessor(private val vars: Map<String, Int>) {
+class CommentPreprocessor(private val indentationChar: Char, private val vars: Map<String, Int>) {
     companion object {
         private val EXPR_PATTERN = Pattern.compile("(.+)(==|!=|<=|>=|<|>)(.+)")
         private val OR_PATTERN = Pattern.quote("||").toPattern()
@@ -286,7 +292,7 @@ class CommentPreprocessor(private val vars: Map<String, Int>) {
     }
 
     private val String.indentation: Int
-        get() = takeWhile { it == ' ' }.length
+        get() = takeWhile { it == indentationChar }.length
 
     fun convertSource(kws: Keywords, lines: List<String>, remapped: List<Pair<String, List<String>>>, fileName: String): List<String> {
         val stack = mutableListOf<IfStackEntry>()
@@ -391,7 +397,7 @@ class CommentPreprocessor(private val vars: Map<String, Int>) {
                         // remap process is only guaranteed to work on code which compiles and since we're
                         // just about to comment it out, it probably doesn't compile.
                         ignoreErrors = true
-                        " ".repeat(currIndent) + kws.eval + " " + originalLine.substring(currIndent)
+                        indentationChar.toString().repeat(currIndent) + kws.eval + " " + originalLine.substring(currIndent)
                     } else {
                         line
                     }
