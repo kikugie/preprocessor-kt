@@ -7,7 +7,7 @@ Modifications in this fork
     tabIndentation = true
   }
   ```
-- Use the node of the current core project (defined in file `mainProject`) as the root node of the graph, so less compilation work when switch to and compile a subproject
+- Use the node of the current core project (defined in file `mainProject`) as the root node of the graph, so less compilation work when switch to and compile a subproject. Noted: this doesn't work for tasks of the root project
 
 
 ### The Preprocessor
