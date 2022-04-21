@@ -13,7 +13,18 @@ open class RootPreprocessExtension : ProjectGraphNodeDSL {
     }
 
     private fun linkNodes(): ProjectGraphNode? {
-        val first = nodes.firstOrNull() ?: return null
+        var first = nodes.firstOrNull() ?: return null
+
+        val coreProjectFile = File("../mainProject")
+        if (coreProjectFile.isFile) {
+            val coreProject = coreProjectFile.readText().trim()
+            val coreNode = nodes.firstOrNull { n ->
+                n.project == coreProject
+            }
+            first = coreNode ?: first
+        }
+        println("rootNode: " + first.project)
+
         val visited = mutableSetOf<Node>()
         fun Node.breadthFirstSearch(): ProjectGraphNode {
             val graphNode = ProjectGraphNode(project, mcVersion, mappings)

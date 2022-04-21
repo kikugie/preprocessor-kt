@@ -1,3 +1,15 @@
+Modifications in this fork
+
+- Added simple tab indentation support
+  ```groovy
+  // in subprojects
+  preprocess {
+    tabIndentation = true
+  }
+  ```
+- Use the node of the current core project (defined in file `mainProject`) as the root node of the graph, so less compilation work when switch to and compile a subproject
+
+
 ### The Preprocessor
 To support multiple Minecraft versions with the ReplayMod, a [JCP](https://github.com/raydac/java-comment-preprocessor)-inspired preprocessor is used:
 ```java
