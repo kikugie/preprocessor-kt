@@ -311,6 +311,9 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
         private val AND_PATTERN = Pattern.quote("&&").toPattern()
     }
 
+    constructor(vars: Map<String, Int>) : this(' ', vars) {
+    }
+
     var fail = false
 
     private fun String.evalVarOrNull() = toIntOrNull() ?: vars[this]
