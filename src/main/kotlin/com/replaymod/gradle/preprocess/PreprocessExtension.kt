@@ -17,5 +17,6 @@ open class PreprocessExtension(objects: ObjectFactory, val mcVersion: Int) {
             ".cfg" to PreprocessTask.CFG_KEYWORDS
     ))
     val patternAnnotation = objects.property<String>()
+    val manageImports = objects.property<Boolean>()
     val tabIndentation = objects.property<Boolean>()
 }
