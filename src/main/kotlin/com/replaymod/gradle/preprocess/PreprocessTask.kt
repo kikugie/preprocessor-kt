@@ -396,7 +396,7 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
             val trimmed = line.trim()
             val mapped = if (trimmed.startsWith(kws.`if`)) {
                 val result = evalCondition(trimmed.substring(kws.`if`.length))
-                stack.push(IfStackEntry(result, elseFound = false, trueFound = result))
+                stack.push(IfStackEntry(result, n, elseFound = false, trueFound = result))
                 indentStack.push(line.indentation)
                 active = active && result
                 line
@@ -418,7 +418,7 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
                 } else {
                     val result = evalCondition(trimmed.substring(kws.elseif.length))
                     stack.pop()
-                    stack.push(IfStackEntry(result, elseFound = false, trueFound = result))
+                    stack.push(IfStackEntry(result, n, elseFound = false, trueFound = result))
                     stack.all { it.currentValue }
                 }
                 line
@@ -427,14 +427,14 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
                     throw ParserException("Unexpected else in line $n of $fileName")
                 }
                 val entry = stack.pop()
-                stack.push(IfStackEntry(!entry.trueFound, elseFound = true, trueFound = entry.trueFound))
+                stack.push(IfStackEntry(!entry.trueFound, n, elseFound = true, trueFound = entry.trueFound))
                 indentStack.pop()
                 indentStack.push(line.indentation)
                 active = stack.all { it.currentValue }
                 line
             } else if (trimmed.startsWith(kws.ifdef)) {
                 val result = vars.containsKey(trimmed.substring(kws.ifdef.length))
-                stack.push(IfStackEntry(result, elseFound = false, trueFound = result))
+                stack.push(IfStackEntry(result, n, elseFound = false, trueFound = result))
                 indentStack.push(line.indentation)
                 active = active && result
                 line
@@ -500,7 +500,7 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
             mapped
         }.also {
             if (stack.isNotEmpty()) {
-                throw ParserException("Missing endif in $fileName")
+                throw ParserException("Missing endif in line ${stack.peek()?.lineno} of $fileName")
             }
         }
     }
@@ -523,6 +523,7 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
 
     data class IfStackEntry(
         var currentValue: Boolean,
+        var lineno: Int,
         var elseFound: Boolean = false,
         var trueFound: Boolean = false
     )
