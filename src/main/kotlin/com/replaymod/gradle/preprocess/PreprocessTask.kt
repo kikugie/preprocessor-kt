@@ -128,6 +128,14 @@ open class PreprocessTask : DefaultTask() {
     @Input
     var reverseMapping: Boolean = false
 
+    @InputDirectory
+    @Optional
+    val jdkHome = project.objects.directoryProperty()
+
+    @InputDirectory
+    @Optional
+    val remappedjdkHome = project.objects.directoryProperty()
+
     @InputFiles
     @Optional
     var classpath: FileCollection? = null
@@ -224,6 +232,8 @@ open class PreprocessTask : DefaultTask() {
             val javaTransformer = Transformer(mappings)
             javaTransformer.patternAnnotation = patternAnnotation.orNull
             javaTransformer.manageImports = manageImports.getOrElse(false)
+            javaTransformer.jdkHome = jdkHome.orNull?.asFile
+            javaTransformer.remappedJdkHome = remappedjdkHome.orNull?.asFile
             LOGGER.debug("Remap Classpath:")
             javaTransformer.classpath = classpath.files.mapNotNull {
                 if (it.exists()) {

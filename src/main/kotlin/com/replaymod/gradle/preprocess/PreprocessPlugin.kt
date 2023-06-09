@@ -7,11 +7,13 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.compile.AbstractCompile
+import org.gradle.api.tasks.compile.JavaCompile
 
 import org.gradle.kotlin.dsl.*
 import java.io.ByteArrayInputStream
@@ -86,8 +88,10 @@ class PreprocessPlugin : Plugin<Project> {
                             generated = generatedKotlin,
                         )
                     }
-                    classpath = (inherited.tasks["compile${cName}${if (kotlin) "Kotlin" else "Java"}"] as AbstractCompile).classpath
-                    remappedClasspath = (project.tasks["compile${cName}${if (kotlin) "Kotlin" else "Java"}"] as AbstractCompile).classpath
+                    jdkHome.set((inherited.tasks["compileJava"] as JavaCompile).javaCompiler.map { it.metadata.installationPath })
+                    remappedjdkHome.set((project.tasks["compileJava"] as JavaCompile).javaCompiler.map { it.metadata.installationPath })
+                    classpath = inherited.tasks["compile${cName}${if (kotlin) "Kotlin" else "Java"}"].classpath
+                    remappedClasspath = project.tasks["compile${cName}${if (kotlin) "Kotlin" else "Java"}"].classpath
                     mapping = mappingFile
                     reverseMapping = reverseMappings
                     vars.convention(ext.vars)
@@ -331,8 +335,13 @@ private val Project.mappingsProvider: Any?
     get() {
         val extension = extensions.findByName("loom") ?: extensions.findByName("minecraft") ?: return null
         if (!extension.javaClass.name.contains("LoomGradleExtension")) return null
-        return extension.maybeGetGroovyProperty("mappingsProvider")  // loom < 1.1
-                ?:extension.withGroovyBuilder { getProperty("mappingConfiguration") }  // loom 1.1
+        listOf(
+            "mappingConfiguration", // Fabric Loom 1.1+
+            "mappingsProvider", // Fabric Loom pre 1.1
+        ).forEach { pro ->
+            extension.maybeGetGroovyProperty(pro)?.also { return it }
+        }
+        return null
     }
 
 private val Project.tinyMappings: File?
@@ -346,6 +355,19 @@ private val Project.tinyMappings: File?
             }
         }
         throw GradleException("loom version not supported by preprocess plugin")
+    }
+
+private val Task.classpath: FileCollection?
+    get() = if (this is AbstractCompile) {
+        this.classpath
+    } else {
+        // assume kotlin 1.7+
+        try {
+            val classpathMethod = this.javaClass.getMethod("getLibraries")
+            classpathMethod.invoke(this) as FileCollection?
+        } catch (ex: Exception) {
+            throw RuntimeException(ex)
+        }
     }
 
 private fun Any.maybeGetGroovyProperty(name: String) = withGroovyBuilder { metaClass }.hasProperty(this, name)?.getProperty(this)
