@@ -307,7 +307,16 @@ private val Project.intermediaryMappings: Mappings?
         mappingsProvider?.maybeGetGroovyProperty("tinyMappingsWithSrg")?.let { // architectury
             val file = (it as Path).toFile()
             if (file.exists()) {
-                return Mappings("searge", file, "tiny", emptyList())
+                val loomExtension = extensions.findByName("loom") ?: extensions.findByName("minecraft")
+                if (loomExtension != null) {
+                    try {
+                        val ret = loomExtension::class.java.getMethod("shouldGenerateSrgTiny").invoke(loomExtension)
+                        if (ret as Boolean) {
+                            return Mappings("searge", file, "tiny", emptyList())
+                        }
+                    } catch (_: NoSuchMethodException) {
+                    }
+                }
             }
         }
         tinyMappings?.let { return Mappings("yarn", it, "tiny", emptyList()) }
