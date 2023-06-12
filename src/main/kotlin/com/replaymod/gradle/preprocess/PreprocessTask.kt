@@ -332,7 +332,7 @@ class CommentPreprocessor(private val indentationChar: Char, private val vars: M
     var fail = false
 
     private fun String.evalVarOrNull() = toIntOrNull() ?: vars[this]
-    private fun String.evalVar() = evalVarOrNull() ?: throw NoSuchElementException(this)
+    private fun String.evalVar() = evalVarOrNull() ?: throw NoSuchElementException("$this not in $vars")
 
     internal fun String.evalExpr(): Boolean {
         split(OR_PATTERN).let { parts ->
