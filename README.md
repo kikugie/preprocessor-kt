@@ -9,6 +9,8 @@ Modifications in this fork
   ```
 - Use the node of the current core project (defined in file `mainProject`) as the root node of the graph, so less compilation work when switch to and compile a subproject. Noted: this doesn't work for tasks of the root project
 - Add line number hint for "Missing endif" error
+- Improved error message when using an undefined variable in the `//#if` expression
+- Improved srg mapping mode detection when using architectury loom
 
 ### The Preprocessor
 To support multiple Minecraft versions with the ReplayMod, a [JCP](https://github.com/raydac/java-comment-preprocessor)-inspired preprocessor is used:
