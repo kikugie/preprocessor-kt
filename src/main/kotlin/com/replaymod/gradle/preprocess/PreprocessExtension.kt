@@ -19,4 +19,5 @@ open class PreprocessExtension(objects: ObjectFactory, val mcVersion: Int) {
     val patternAnnotation = objects.property<String>()
     val manageImports = objects.property<Boolean>()
     val tabIndentation = objects.property<Boolean>()
+    val enableRemapMessageCollector = objects.property<Boolean>()
 }

@@ -162,6 +162,10 @@ open class PreprocessTask : DefaultTask() {
     @Optional
     val tabIndentation = project.objects.property<Boolean>();
 
+    @Input
+    @Optional
+    val enableRemapMessageCollector = project.objects.property<Boolean>();
+
     @Deprecated("Instead add an entry to `entries`.",
         replaceWith = ReplaceWith(expression = "entry(project.file(file), generated, overwrites)"))
     fun source(file: Any) {
@@ -230,6 +234,7 @@ open class PreprocessTask : DefaultTask() {
                 Files.createDirectories(it.parent)
             })
             val javaTransformer = Transformer(mappings)
+            javaTransformer.enableMessageCollector = enableRemapMessageCollector.getOrElse(false)
             javaTransformer.patternAnnotation = patternAnnotation.orNull
             javaTransformer.manageImports = manageImports.getOrElse(false)
             javaTransformer.jdkHome = jdkHome.orNull?.asFile
