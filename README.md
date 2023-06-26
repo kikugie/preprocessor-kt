@@ -11,7 +11,8 @@ Modifications in this fork
 - Add line number hint for "Missing endif" error
 - Improved error message when using an undefined variable in the `//#if` expression
 - Improved srg mapping mode detection when using architectury loom
-- Disable message logging of [remap](https://github.com/Fallen-Breath/remap)'s kotlin compilier message collector by default. You can re-enable that by setting `preprocess { enableRemapMessageCollector = true }`
+- Use custom [remap](https://github.com/ReplayMod/remap) fork: https://github.com/Fallen-Breath/remap
+  - Disable message logging of remap's kotlin compiler message collector by default. You can re-enable that by setting `preprocess { enableRemapMessageCollector = true }`
 
 ### The Preprocessor
 To support multiple Minecraft versions with the ReplayMod, a [JCP](https://github.com/raydac/java-comment-preprocessor)-inspired preprocessor is used:
