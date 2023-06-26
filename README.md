@@ -12,6 +12,7 @@ Modifications in this fork
 - Improved error message when using an undefined variable in the `//#if` expression
 - Improved srg mapping mode detection when using architectury loom
 - Use custom [remap](https://github.com/ReplayMod/remap) fork: https://github.com/Fallen-Breath/remap
+  - Less useless warning messages
   - Disable message logging of remap's kotlin compiler message collector by default. You can re-enable that by setting `preprocess { enableRemapMessageCollector = true }`
 
 ### The Preprocessor
