@@ -15,6 +15,7 @@
  */
 
 plugins {
+    kotlin("jvm") version("1.9.10")
     `kotlin-dsl`
     `maven-publish`
     groovy
@@ -57,7 +58,7 @@ repositories {
 dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
-    implementation("com.github.Fallen-Breath:remap:6d1565046f")
+    implementation("com.github.Fallen-Breath:remap:5cda617")
     implementation("net.fabricmc:tiny-mappings-parser:0.2.1.13")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
